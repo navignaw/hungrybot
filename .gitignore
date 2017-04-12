@@ -1,9 +1,6 @@
 # Config files
 .env
 
-# Transpiled files
-dist
-
 # Logs
 logs
 *.log
