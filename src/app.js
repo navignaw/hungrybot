@@ -24,7 +24,7 @@ app.get('/', function(req, res) {
 });
 
 // Read and respond to requests.
-app.get('/webhook/', function(req, res) {
+app.post('/webhook/', function(req, res) {
   const data = req.body;
 
   // Make sure this is a page subscription
