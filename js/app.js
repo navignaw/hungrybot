@@ -60,7 +60,8 @@ function receivedMessage(event) {
     senderId, recipientId, timeOfMessage);
   console.log(JSON.stringify(message));
 
-  sendTextMessage(senderId);
+  const restaurant = Recommendations.randomRestaurant();
+  callSendAPI(getMessageTemplate(senderId, restaurant));
 }
 
 
@@ -73,18 +74,47 @@ function receivedPostback(event) {
 }
 
 /**
- * Sends a text message using Send API.
+ * Creates a json object for a generic Send API message using the provided
+ * recipient id and restaurant data.
  */
-function sendTextMessage(recipientId, messageText) {
-  const messageData = {
+function getMessageTemplate(recipientId, restaurant) {
+  return {
     recipient: {
       id: recipientId
     },
     message: {
-      text: Recommendations.randomRestaurant(),
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'generic',
+          elements: [
+            {
+              title: restaurant.title,
+              image_url: restaurant.imageUrl,
+              subtitle: restaurant.location,
+              default_action: {
+                type: 'web_url',
+                url: restaurant.yelpUrl,
+                messenger_extensions: true,
+                webview_height_ratio: 'tall',
+              },
+              buttons: [
+                {
+                  type: 'web_url',
+                  title: 'View on Yelp',
+                  url: restaurant.yelpUrl,
+                }, {
+                  type: 'web_url',
+                  title: 'Directions',
+                  url: restaurant.mapsUrl,
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   };
-  callSendAPI(messageData);
 }
 
 
@@ -92,6 +122,7 @@ function sendTextMessage(recipientId, messageText) {
  * Call the Send API with a response.
  */
 function callSendAPI(messageData) {
+  console.log('sending request', messageData);
   request({
     uri: REQUEST_URI,
     qs: {access_token: ACCESS_TOKEN},
