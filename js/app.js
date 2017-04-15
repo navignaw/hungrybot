@@ -60,8 +60,15 @@ function receivedMessage(event) {
     senderId, recipientId, timeOfMessage);
   console.log(JSON.stringify(message));
 
-  const restaurant = Recommendations.randomRestaurant();
-  callSendAPI(getMessageTemplate(senderId, restaurant));
+  const flavorText = Recommendations.randomFlavorText();
+  callSendAPI(getSenderActionTemplate(senderId, 'typing_on'));
+  setTimeout(() => {
+    callSendAPI(getTextTemplate(senderId, flavorText));
+    setTimeout(() => {
+      const restaurant = Recommendations.randomRestaurant();
+      callSendAPI(getMessageTemplate(senderId, restaurant));
+    }, 1000);
+  }, 2000);
 }
 
 
@@ -71,6 +78,36 @@ function receivedMessage(event) {
 function receivedPostback(event) {
   // TODO: implement!
   console.log('postback not yet implemented');
+}
+
+
+/**
+ * Creates a json object for a generic Send API action using the provided
+ * recipient id and sender action.
+ */
+function getSenderActionTemplate(recipientId, senderAction) {
+  return {
+    recipient: {
+      id: recipientId
+    },
+    sender_action: senderAction
+  };
+}
+
+
+/**
+ * Creates a json object for a generic Send API message using the provided
+ * recipient id and text string.
+ */
+function getTextTemplate(recipientId, messageText) {
+  return {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText
+    },
+  };
 }
 
 /**
